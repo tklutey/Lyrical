@@ -2,6 +2,10 @@ import string
 import time
 import re
 import urllib
+
+"""
+Function that scrapes azlyrics.com and returns song lyrics as string.
+"""
 def lyrics(artist,song):
     artist = artist.lower()
     song = song.lower()
@@ -18,6 +22,9 @@ def lyrics(artist,song):
     lyrics = re.sub('(<.*?>)',"",lyrics)
     return lyrics
 
+"""
+Function to convert Spotify metadata syntax into html-compatible queries.
+"""
 def convert_query(input):
     input.replace(" ", "")
     input.replace(".", "")
