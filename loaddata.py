@@ -19,19 +19,26 @@ def parse_playlist(uri):
 
     for i,t in enumerate(results['tracks']['items']):
             current = t['track']
-            song_name = current['name']
+
+            ## Artist table
             artist_name = current.get('album').get('artists')[0].get('name')
             artist_uri = current.get('album').get('artists')[0].get('uri')
-            album_name = current.get('album').get('name')
-            album_uri = current.get('album').get('uri')
+
+            ## Song table
+            song_name = current['name']
             track_uri = current['uri']
             track_lyrics = lyrics.lyrics(artist_name, song_name)
 
-            album = sp.album(album_uri)
-            year = album.get('release_date')
+            ## Album table
+            album_name = current.get('album').get('name')
+            album_uri = current.get('album').get('uri')
 
-            artist = sp.artist(artist_uri)
-            genres = artist.get('genres')
+            ## Year table
+            year = sp.album(album_uri).get('release_date')
+
+            ## Genre table
+            genres = sp.artist(artist_uri).get('genres')
+
 
             print song_name + ", " + artist_name + ", " + album_name + ", " + year + ", " \
                  + ", " + track_uri
