@@ -14,14 +14,16 @@ def lyrics(input_artist,input_song):
         request = "http://azlyrics.com/lyrics/"+str(artist)+"/"+str(song)+".html"
         raw_html = urllib.urlopen(request)
         html_copy = str(raw_html.read())
-        split = html_copy.split('<!-- Usage of azlyrics.com content by any third-party lyrics provider is prohibited by our licensing agreement. Sorry about that. -->', 1);
+        split = html_copy.split('<!-- Usage of azlyrics.com content by any third-party '
+                                'lyrics provider is prohibited by our licensing agreement. Sorry about that. -->', 1);
         words = split[1].split('<!-- MxM banner -->');
         split = words[0].split('</div>')
         lyrics = split[0]
         lyrics = re.sub('(<.*?>)',"",lyrics)
         return lyrics
     except IndexError:      #means that there are no lyrics for given song on azlyrics
-        return "No Lyrics Found"
+        sys.stderr.write("No Lyrics Found \n")
+        return None
 
 """
 Function to convert Spotify metadata syntax into html-compatible queries.
