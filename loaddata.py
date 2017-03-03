@@ -3,9 +3,11 @@ __author__ = 'tklutey'
 from spotipy.oauth2 import SpotifyClientCredentials
 import spotipy
 import json
+import lyrics
+import pprint
 
 
-def return_playlist(uri):
+def parse_playlist(uri):
 
     client_credentials_manager = SpotifyClientCredentials()
     sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
@@ -15,25 +17,37 @@ def return_playlist(uri):
 
     results = sp.user_playlist(username, playlist_id)
 
-    top_songs = []
-    sql_data = {}
-
-    for i, t in enumerate(results['tracks']['items']):
+    for i,t in enumerate(results['tracks']['items']):
             current = t['track']
-            sql_data = current['album']['name']
+            song_name = current['name']
+            artist_name = current.get('album').get('artists')[0].get('name')
+            artist_uri = current.get('album').get('artists')[0].get('uri')
+            album_name = current.get('album').get('name')
+            album_uri = current.get('album').get('uri')
+            track_uri = current['uri']
+            track_lyrics = lyrics.lyrics(artist_name, song_name)
 
-    print json.dumps(results, indent=4)
-    #print json.dumps(sql_data, indent=4)
+            album = sp.album(album_uri)
+            year = album.get('release_date')
+
+            artist = sp.artist(artist_uri)
+            genres = artist.get('genres')
+
+            print song_name + ", " + artist_name + ", " + album_name + ", " + year + ", " \
+                 + ", " + track_uri
+            print genres
+            print track_lyrics
+            print "---------------------------------------------"
 
 
-
-    return results
+    #print json.dumps(results, indent=4)
+    #return results
 
 
 def main():
 
     playlist_uri = 'spotify:user:tklutey:playlist:4jsH6oQYN8jA29OWdKaxAM'
-    return_playlist(playlist_uri)
+    parse_playlist(playlist_uri)
 
 if __name__ == "__main__":
     main()

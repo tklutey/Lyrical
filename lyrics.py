@@ -7,7 +7,9 @@ import sys
 """
 Function that scrapes azlyrics.com and returns song lyrics as string.
 """
-def lyrics(artist,song):
+def lyrics(input_artist,input_song):
+    artist = convert_query(input_artist)
+    song = convert_query(input_song)
     try:
         request = "http://azlyrics.com/lyrics/"+str(artist)+"/"+str(song)+".html"
         raw_html = urllib.urlopen(request)
@@ -19,7 +21,7 @@ def lyrics(artist,song):
         lyrics = re.sub('(<.*?>)',"",lyrics)
         return lyrics
     except IndexError:      #means that there are no lyrics for given song on azlyrics
-        return " "
+        return "No Lyrics Found"
 
 """
 Function to convert Spotify metadata syntax into html-compatible queries.
@@ -62,28 +64,28 @@ def word_cloud(lyrics):
     plt.axis("off")
     plt.show()
 
-def main():
-
-    ##if user provides CL args
-    if(len(sys.argv) == 3):
-        input_query = sys.argv[1]
-        input_artist = sys.argv[2]
-        tracklist = test(input_query, input_artist)
-    ##default
-    else:
-        input_artist = "Kanye West"
-        input_query = "The Life of Pablo"
-        tracklist = test(input_query, input_artist)
-
-    song_lyrics = []
-
-    for i in tracklist:
-        artist = convert_query(input_artist)
-        song = convert_query(i)
-        song_lyrics.append(lyrics(artist, song))
-
-    word_mass = ''.join(song_lyrics)
-    word_cloud(word_mass)
+# def main():
+#
+#     ##if user provides CL args
+#     if(len(sys.argv) == 3):
+#         input_query = sys.argv[1]
+#         input_artist = sys.argv[2]
+#         tracklist = test(input_query, input_artist)
+#     ##default
+#     else:
+#         input_artist = "Kanye West"
+#         input_query = "The Life of Pablo"
+#         tracklist = test(input_query, input_artist)
+#
+#     song_lyrics = []
+#
+#     for i in tracklist:
+#         artist = convert_query(input_artist)
+#         song = convert_query(i)
+#         song_lyrics.append(lyrics(artist, song))
+#
+#     word_mass = ''.join(song_lyrics)
+#     word_cloud(word_mass)
 
 
 if __name__ == "__main__":
