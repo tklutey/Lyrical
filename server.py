@@ -67,7 +67,7 @@ def before_request():
   try:
     g.conn = engine.connect()
   except:
-    print "uh oh, problem connecting to database"
+    print ("uh oh, problem connecting to database")
     import traceback; traceback.print_exc()
     g.conn = None
 
@@ -109,7 +109,7 @@ def index():
   """
 
   # DEBUG: this is debugging code to see what request looks like
-  print request.args
+  print (request.args)
 
 
   #
@@ -164,9 +164,9 @@ def index():
 # Notice that the function name is another() rather than index()
 # The functions for each app.route need to have different names
 #
-@app.route('/another')
-def another():
-  return render_template("another.html")
+#@app.route('/another')
+#def another():
+#  return render_template("another.html")
 
 
 # Example of adding new data to the database
@@ -181,6 +181,21 @@ def add():
 def login():
     abort(401)
     this_is_never_executed()
+
+@app.route('/another.html', methods=['GET','POST'])
+def results():
+    name = request.form.getlist('name')
+    print(name)
+    names = []
+    i = 0
+    while(i<len(name)):
+        cursor = g.conn.execute("SELECT * FROM artist WHERE artist_name = '{}'".format(name[i]))
+        for result in cursor:
+            names.append(result['artist_name'])  # can also be accessed using result[0]
+        cursor.close()
+        i+=1
+    context = dict(data=names)
+    return render_template("another.html", **context)
 
 
 if __name__ == "__main__":
@@ -205,7 +220,7 @@ if __name__ == "__main__":
     """
 
     HOST, PORT = host, port
-    print "running on %s:%d" % (HOST, PORT)
+    print ("running on %s:%d" % (HOST, PORT))
     app.run(host=HOST, port=PORT, debug=debug, threaded=threaded)
 
 
