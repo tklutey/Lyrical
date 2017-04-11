@@ -20,6 +20,10 @@ import os
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response
+from wordcloud import WordCloud
+import io
+import base64
+
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -169,6 +173,41 @@ def another():
   return render_template("another.html")
 
 
+@app.route('/cloud')
+def cloud():
+
+    lyric_query = "SELECT lyrics FROM SONG WHERE song_name LIKE 'Famous' ;"
+    cursor = engine.execute(text(lyric_query))
+    lyric_list = []
+    for row in cursor:
+        lyric_list.append((row['lyrics']))
+    word_mass = ''.join(lyric_list)
+
+    cloud = WordCloud().generate(word_mass)
+
+    # Display the generated image:
+    # the matplotlib way:
+    import matplotlib.pyplot as plt
+    plt.imshow(cloud)
+    plt.axis("off")
+
+    # lower max_font_size
+    cloud = WordCloud(max_font_size=40).generate(word_mass)
+    plt.figure()
+    plt.imshow(cloud)
+    plt.axis("off")
+    # plt.show()
+    plt.savefig('templates/images/cloud.png')
+
+    figfile = io.BytesIO()
+    plt.savefig(figfile, format='png')
+    figfile.seek(0)
+    figdata_png = base64.b64encode(figfile.getvalue())
+    result = figdata_png
+
+    return render_template('cloud.html', result=result)
+
+
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
 def add():
@@ -177,10 +216,10 @@ def add():
   return redirect('/')
 
 
-@app.route('/login')
-def login():
-    abort(401)
-    this_is_never_executed()
+# @app.route('/login')
+# def login():
+#     abort(401)
+#     this_is_never_executed()
 
 
 if __name__ == "__main__":
