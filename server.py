@@ -1,4 +1,4 @@
-__author__ = 'tklutey'
+__author__ = 'tklutey, abair'
 
 #!/usr/bin/env python2.7
 
@@ -232,6 +232,7 @@ def results():
         cursor = g.conn.execute("SELECT * FROM artist WHERE artist_name = '{}'".format(name[i]))
         for result in cursor:
             names.append(result['artist_name'])  # can also be accessed using result[0]
+            print("made it here for name")
         cursor.close()
         i+=1
    # context = dict(data=names)
@@ -244,6 +245,7 @@ def results():
         cursor = g.conn.execute("SELECT * FROM song WHERE year = '{}'".format(year[i]))
         for result in cursor:
             years.append(result['year'])  # can also be accessed using result[0]
+            print("made it here for year")
         cursor.close()
         i += 1
 
@@ -252,7 +254,6 @@ def results():
 
     return render_template("another.html", **context)
 
-#wtf
 if __name__ == "__main__":
   import click
 
