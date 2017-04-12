@@ -317,7 +317,20 @@ def results():
     songs = song
 
     #Create list of interesection for these lists
-    intersection = list(set.intersection(set(names),set(songs)))
+    filledLists = []
+    #this is super sloppy and horrid, but whatever
+    if(len(names)!=0):
+        filledLists.append(names)
+    if (len(years) != 0):
+        filledLists.append(years)
+    if (len(albums) != 0):
+        filledLists.append(albums)
+    if (len(genres) != 0):
+        filledLists.append(genres)
+    if (len(songs) != 0):
+        filledLists.append(songs)
+
+    intersection = list(set(filledLists[0]).intersection(*filledLists))
     print("please work")
     print(intersection)
 
