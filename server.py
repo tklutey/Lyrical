@@ -285,10 +285,43 @@ def results():
         cursor.close()
         i += 1
 
-    # context = dict(years=years)
 
+    #find songs from album
+    album = request.form.getlist('album')
+    albums = []
+    i = 0
+    while (i < len(album)):
+        cursor = g.conn.execute("SELECT song_name FROM song,album WHERE song.album_id = album.album_id"
+                                " AND album_name = '{}'".format(album[i]))
+        for result in cursor:
+            albums.append(result['song_name'])  # can also be accessed using result[0]
+            print("made it here for album")
+        cursor.close()
+        i += 1
 
-    return render_template("another.html", names = names, years = years)
+    #find songs from genre
+    genre = request.form.getlist('genre')
+    genres = []
+    i = 0
+    while (i < len(genre)):
+        cursor = g.conn.execute("SELECT song_name FROM song,genre WHERE song.artist_id = genre.artist_id"
+                                " AND genre_name = '{}'".format(genre[i]))
+        for result in cursor:
+            genres.append(result['song_name'])  # can also be accessed using result[0]
+            print("made it here for genre")
+        cursor.close()
+        i += 1
+
+    #find songs in songs
+    song = request.form.getlist('song')
+    songs = song
+
+    #Create list of interesection for these lists
+    intersection = list(set.intersection(set(names),set(songs)))
+    print("please work")
+    print(intersection)
+
+    return render_template("another.html", names = names, years = years, albums = albums, genres = genres, songs = songs )
 
 @app.route('/')
 def my_view():

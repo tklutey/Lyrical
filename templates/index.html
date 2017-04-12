@@ -13,7 +13,7 @@
 
   <!--Dropdown menus-->
   <form name = selection action="another.html" method='POST'>
-      <select multiple name = "songs">
+      <select multiple name = "song">
           {% for n in songs %}
                 <option value="{{ n }}">{{ n }}</option>
           {% endfor %}
@@ -28,12 +28,12 @@
                 <option value="{{ n }}">{{ n }}</option>
           {% endfor %}
       </select>
-      <select multiple name = "genres">
+      <select multiple name = "genre">
           {% for n in genres %}
                 <option value="{{ n }}">{{ n }}</option>
           {% endfor %}
       </select>
-      <select multiple name = "albums">
+      <select multiple name = "album">
           {% for n in albums %}
                 <option value="{{ n }}">{{ n }}</option>
           {% endfor %}
