@@ -25,6 +25,7 @@ import io
 import base64
 
 
+
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
 
@@ -124,6 +125,36 @@ def index():
   for result in cursor:
     names.append(result['artist_name'])  # can also be accessed using result[0]
   cursor.close()
+  names = sorted(removeDuplicates(names))
+
+  cursor = g.conn.execute("SELECT year FROM song")
+  years = []
+  for result in cursor:
+      years.append(result['year'])  # can also be accessed using result[0]
+  cursor.close()
+  years = sorted(removeDuplicates(years))
+  print(years)
+
+  cursor = g.conn.execute("SELECT genre_name FROM genre")
+  genres = []
+  for result in cursor:
+      genres.append(result['genre_name'])  # can also be accessed using result[0]
+  cursor.close()
+  genres = sorted(removeDuplicates(genres))
+
+  cursor = g.conn.execute("SELECT album_name FROM album")
+  albums = []
+  for result in cursor:
+      albums.append(result['album_name'])  # can also be accessed using result[0]
+  cursor.close()
+  albums = sorted(removeDuplicates(albums))
+
+  cursor = g.conn.execute("SELECT song_name FROM song")
+  songs = []
+  for result in cursor:
+      songs.append(result['song_name'])  # can also be accessed using result[0]
+  cursor.close()
+  songs = sorted(removeDuplicates(songs))
 
   #
   # Flask uses Jinja templates, which is an extension to HTML where you can
@@ -151,13 +182,15 @@ def index():
   #     <div>{{n}}</div>
   #     {% endfor %}
   #
-  context = dict(data = names)
+
+  # context = dict(names = names)
+  # context2 = dict(years =years )
 
   #
   # render_template looks in the templates/ folder for files.
   # for example, the below file reads template/index.html
   #
-  return render_template("index.html", **context)
+  return render_template("index.html", years=years,names = names,genres = genres,albums = albums,songs = songs)
 
 #
 # This is an example of a different path.  You can see it at:
@@ -171,6 +204,10 @@ def index():
 #def another():
 #  return render_template("another.html")
 
+def removeDuplicates(values):
+    mySet = set(values)
+    result = list(mySet)
+    return result
 
 @app.route('/cloud')
 def cloud():
