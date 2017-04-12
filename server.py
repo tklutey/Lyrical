@@ -259,36 +259,36 @@ def add():
 
 @app.route('/another.html', methods=['GET','POST'])
 def results():
-    #find names
+    #find songs from name
     name = request.form.getlist('name')
     print(name)
     names = []
     i = 0
     while(i<len(name)):
-        cursor = g.conn.execute("SELECT * FROM artist WHERE artist_name = '{}'".format(name[i]))
+        cursor = g.conn.execute("SELECT song_name FROM artist,song WHERE song.artist_id = artist.artist_id"
+                                " AND artist_name = '{}'".format(name[i]))
         for result in cursor:
-            names.append(result['artist_name'])  # can also be accessed using result[0]
+            names.append(result['song_name'])  # can also be accessed using result[0]
             print("made it here for name")
         cursor.close()
         i+=1
-   # context = dict(data=names)
-
+# find songs from year
     year = request.form.getlist('year')
     print(year)
     years = []
     i = 0
     while (i < len(year)):
-        cursor = g.conn.execute("SELECT * FROM song WHERE year = '{}'".format(year[i]))
+        cursor = g.conn.execute("SELECT song_name FROM song WHERE year = '{}'".format(year[i]))
         for result in cursor:
-            years.append(result['year'])  # can also be accessed using result[0]
+            years.append(result['song_name'])  # can also be accessed using result[0]
             print("made it here for year")
         cursor.close()
         i += 1
 
-    context = dict(years=years)
+    # context = dict(years=years)
 
 
-    return render_template("another.html", **context)
+    return render_template("another.html", names = names, years = years)
 
 @app.route('/')
 def my_view():

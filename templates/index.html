@@ -12,18 +12,18 @@
   <div>{{data}}</div>
 
   <!--Dropdown menus-->
-  <form action = "/" method="POST">
+  <form name = selection action="another.html" method='POST'>
       <select multiple name = "songs">
           {% for n in songs %}
                 <option value="{{ n }}">{{ n }}</option>
           {% endfor %}
       </select>
-      <select multiple name = "names">
+      <select multiple name = "name">
           {% for n in names %}
                 <option value="{{ n }}">{{ n }}</option>
           {% endfor %}
       </select>
-      <select multiple name = "years">
+      <select multiple name = "year">
           {% for n in years %}
                 <option value="{{ n }}">{{ n }}</option>
           {% endfor %}

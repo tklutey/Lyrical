@@ -9,14 +9,19 @@
 
 <body>
     <h1>Lyrical</h1>
-    <div>{{data}}</div>
 
 
       <div>
-        {% for n in data %}
+        {% for n in names %}
         <div>{{n}}</div>
         {% endfor %}
       </div>
+
+        <div>
+            {% for n in years %}
+            <div>{{n}}</div>
+            {% endfor %}
+        </div>
 
 </body>
 
