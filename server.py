@@ -153,7 +153,6 @@ def index():
   #
   context = dict(data = names)
 
-
   #
   # render_template looks in the templates/ folder for files.
   # for example, the below file reads template/index.html
@@ -249,10 +248,18 @@ def results():
         cursor.close()
         i += 1
 
-    context = dict(data=years)
+    context = dict(years=years)
 
 
     return render_template("another.html", **context)
+
+@app.route('/')
+def my_view():
+    year = [1,2,3]
+    context = dict(data=year)
+    return render_template('index.html',**context)
+
+
 
 if __name__ == "__main__":
   import click

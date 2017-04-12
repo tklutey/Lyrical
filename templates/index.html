@@ -12,20 +12,13 @@
   <div>{{data}}</div>
 
   <!--Dropdown menus-->
-  <select>
-      <option value="volvo">Volvo</option>
-      <option value="saab">Saab</option>
-      <option value="mercedes">Mercedes</option>
-      <option value="audi">Audi</option>
-      <option value="fuck you">fuck you</option>
-  </select>
-
-  <select>
-      <option value="Radiohead">Radiohead</option>
-      <option value="artist2">artist2</option>
-      <option value="artist3">artist3</option>
-      <option value="artist4">artist4</option>
-  </select>
+  <form action = "/" method="POST">
+      <select name = "test">
+          {% for n in data %}
+                <option value="{{ n }}">{{ n }}</option>
+          {% endfor %}
+      </select>
+  </form>
 
   <form name="name" action="another.html" method='POST'>
     <select multiple name="name">
@@ -42,6 +35,9 @@
     <button type="submit">Search</button>
 </form>
 
+
+
+
   <div>
     {% for n in data %}
     <div>{{n}}</div>
@@ -51,6 +47,8 @@
 <p><a href="another">Go to the other page</a></p>
 
   <p><a href="cloud">Check out a sample word cloud!</a></p>
+
+
 
 
 
