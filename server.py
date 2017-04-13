@@ -133,7 +133,7 @@ def index():
       years.append(result['year'])  # can also be accessed using result[0]
   cursor.close()
   years = sorted(removeDuplicates(years))
-  print(years)
+
 
   cursor = g.conn.execute("SELECT genre_name FROM genre")
   genres = []
@@ -209,9 +209,20 @@ def removeDuplicates(values):
     result = list(mySet)
     return result
 
-@app.route("/songLyrics")
+@app.route('/songLyrics.html', methods=['POST'])
+def songLyrics():
+    song = request.form['song']
+    cursor = engine.execute("SELECT lyrics FROM song WHERE song_name = '{}'".format(song))
 
+    lyric_list = 0
+    for result in cursor:
+        lyric_list = (result['lyrics'])
+    # print(lyric_list)
+    list = lyric_list.splitlines()
 
+    # print(lyric_list[2])
+    # print(lyric_list)
+    return render_template('songLyrics.html',lyrics = list)
 
 
 @app.route('/cloud')
@@ -266,7 +277,7 @@ def add():
 def results():
     #find songs from name
     name = request.form.getlist('name')
-    print(name)
+
     names = []
     i = 0
     while(i<len(name)):
@@ -274,19 +285,19 @@ def results():
                                 " AND artist_name = '{}'".format(name[i]))
         for result in cursor:
             names.append(result['song_name'])  # can also be accessed using result[0]
-            print("made it here for name")
+
         cursor.close()
         i+=1
 # find songs from year
     year = request.form.getlist('year')
-    print(year)
+
     years = []
     i = 0
     while (i < len(year)):
         cursor = g.conn.execute("SELECT song_name FROM song WHERE year = '{}'".format(year[i]))
         for result in cursor:
             years.append(result['song_name'])  # can also be accessed using result[0]
-            print("made it here for year")
+
         cursor.close()
         i += 1
 
@@ -300,7 +311,7 @@ def results():
                                 " AND album_name = '{}'".format(album[i]))
         for result in cursor:
             albums.append(result['song_name'])  # can also be accessed using result[0]
-            print("made it here for album")
+
         cursor.close()
         i += 1
 
@@ -313,7 +324,7 @@ def results():
                                 " AND genre_name = '{}'".format(genre[i]))
         for result in cursor:
             genres.append(result['song_name'])  # can also be accessed using result[0]
-            print("made it here for genre")
+
         cursor.close()
         i += 1
 
@@ -336,8 +347,7 @@ def results():
         filledLists.append(songs)
 
     intersection = list(set(filledLists[0]).intersection(*filledLists))
-    print("please work")
-    print(intersection)
+
 
     return render_template("another.html", names = names, years = years, albums = albums, genres = genres, songs = songs )
 
