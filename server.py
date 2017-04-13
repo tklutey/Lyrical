@@ -209,6 +209,11 @@ def removeDuplicates(values):
     result = list(mySet)
     return result
 
+@app.route("/songLyrics")
+
+
+
+
 @app.route('/cloud')
 def cloud():
 

@@ -65,6 +65,19 @@
     {% endfor %}
   </div>
 
+
+  <p>Just want the song lyrics?  Select a song here</p>
+  <form name = selection action="songLyrics.html" method='POST'>
+      <select multiple name = "song">
+          {% for n in songs %}
+                <option value="{{ n }}">{{ n }}</option>
+          {% endfor %}
+      </select>
+      <button type="submit">Gimme the lyrics</button>
+  </form>
+
+
+
 <p><a href="another">Go to the other page</a></p>
 
   <p><a href="cloud">Check out a sample word cloud!</a></p>
