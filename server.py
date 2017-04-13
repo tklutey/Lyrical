@@ -25,7 +25,7 @@ import io
 import base64
 import spotipy
 import spotipy.util as util
-from lyric_cloud import word_cloud
+# from lyric_cloud import word_cloud
 
 
 
@@ -105,7 +105,7 @@ def teardown_request(exception):
 # see for routing: http://flask.pocoo.org/docs/0.10/quickstart/#routing
 # see for decorators: http://simeonfranklin.com/blog/2012/jul/1/python-decorators-in-12-steps/
 #
-@app.route('/')
+@app.route('/', methods=['POST', 'GET'])
 def index():
   """
   request is a special object that Flask provides to access web request information:
@@ -120,13 +120,21 @@ def index():
   # DEBUG: this is debugging code to see what request looks like
   print (request.args)
 
+  if request.form:
+      new_playlist = request.form.getlist('playlist')[0]
+     #add data malarky
+
+
+
+
+
   lyric_query = "SELECT lyrics FROM SONG ;"
   cursor = engine.execute(text(lyric_query))
   lyric_list = []
   for row in cursor:
     lyric_list.append((row['lyrics']))
 
-  result = word_cloud(lyric_list)
+  # result = word_cloud(lyric_list)
 
   #
   # example of a database query
@@ -167,6 +175,13 @@ def index():
   cursor.close()
   songs = sorted(removeDuplicates(songs))
 
+  cursor = g.conn.execute("SELECT playlist_name FROM playlist")
+  playlists = []
+  for result in cursor:
+      playlists.append((result["playlist_name"]))
+  cursor.close()
+  playlists = sorted(playlists)
+
   #
   # Flask uses Jinja templates, which is an extension to HTML where you can
   # pass data to a template and dynamically generate HTML based on the data
@@ -202,7 +217,8 @@ def index():
   # for example, the below file reads template/index.html
   #
 
-  return render_template("index.html", years=years,names = names,genres = genres,albums = albums,songs = songs)
+  return render_template("index.html", years=years,names = names,genres = genres,albums = albums,songs = songs,
+                         playlists = playlists)
 
 #
 # This is an example of a different path.  You can see it at:
@@ -223,7 +239,7 @@ def index():
 
 @app.route('/testpage', methods=['POST', 'GET'])
 def testpage():
-    print "got it!"
+    print ("got it!")
     username = request.form['username']
     client_id = "08ce831d3cc3450a80d4333d11bb9945"
     client_secret = "08434edc62004761a790d8014a3a5e79"
@@ -238,7 +254,7 @@ def testpage():
         playlist_names.append(playlist['name'])
 
     for x in playlist_names:
-        print x
+        print (x)
 
     return render_template("testpage.html", username=username, playlists=playlist_names)
 
@@ -263,19 +279,19 @@ def songLyrics():
     return render_template('songLyrics.html',lyrics = list)
 
 
-@app.route('/cloud')
-def cloud():
+# @app.route('/cloud')
+# def cloud():
 
     ##NOT NECESSARY IN FINAL
-    lyric_query = "SELECT lyrics FROM SONG WHERE song_name LIKE 'Famous' ;"
-    cursor = engine.execute(text(lyric_query))
-    lyric_list = []
-    for row in cursor:
-        lyric_list.append((row['lyrics']))
-
-
-    result = word_cloud(lyric_list)
-    return render_template('cloud.html', result=result)
+    # lyric_query = "SELECT lyrics FROM SONG WHERE song_name LIKE 'Famous' ;"
+    # cursor = engine.execute(text(lyric_query))
+    # lyric_list = []
+    # for row in cursor:
+    #     lyric_list.append((row['lyrics']))
+    #
+    #
+    # result = word_cloud(lyric_list)
+    # return render_template('cloud.html', result=result)
 
 
 # Example of adding new data to the database
