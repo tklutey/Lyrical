@@ -1,4 +1,4 @@
-__author__ = 'tklutey'
+__author__ = 'tklutey, abair'
 
 #!/usr/bin/env python2.7
 
@@ -23,6 +23,7 @@ from flask import Flask, request, render_template, g, redirect, Response
 from wordcloud import WordCloud
 import io
 import base64
+
 
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
@@ -124,6 +125,36 @@ def index():
   for result in cursor:
     names.append(result['artist_name'])  # can also be accessed using result[0]
   cursor.close()
+  names = sorted(removeDuplicates(names))
+
+  cursor = g.conn.execute("SELECT year FROM song")
+  years = []
+  for result in cursor:
+      years.append(result['year'])  # can also be accessed using result[0]
+  cursor.close()
+  years = sorted(removeDuplicates(years))
+  print(years)
+
+  cursor = g.conn.execute("SELECT genre_name FROM genre")
+  genres = []
+  for result in cursor:
+      genres.append(result['genre_name'])  # can also be accessed using result[0]
+  cursor.close()
+  genres = sorted(removeDuplicates(genres))
+
+  cursor = g.conn.execute("SELECT album_name FROM album")
+  albums = []
+  for result in cursor:
+      albums.append(result['album_name'])  # can also be accessed using result[0]
+  cursor.close()
+  albums = sorted(removeDuplicates(albums))
+
+  cursor = g.conn.execute("SELECT song_name FROM song")
+  songs = []
+  for result in cursor:
+      songs.append(result['song_name'])  # can also be accessed using result[0]
+  cursor.close()
+  songs = sorted(removeDuplicates(songs))
 
   #
   # Flask uses Jinja templates, which is an extension to HTML where you can
@@ -151,14 +182,15 @@ def index():
   #     <div>{{n}}</div>
   #     {% endfor %}
   #
-  context = dict(data = names)
 
+  # context = dict(names = names)
+  # context2 = dict(years =years )
 
   #
   # render_template looks in the templates/ folder for files.
   # for example, the below file reads template/index.html
   #
-  return render_template("index.html", **context)
+  return render_template("index.html", years=years,names = names,genres = genres,albums = albums,songs = songs)
 
 #
 # This is an example of a different path.  You can see it at:
@@ -172,6 +204,10 @@ def index():
 #def another():
 #  return render_template("another.html")
 
+def removeDuplicates(values):
+    mySet = set(values)
+    result = list(mySet)
+    return result
 
 @app.route('/cloud')
 def cloud():
@@ -223,36 +259,91 @@ def add():
 
 @app.route('/another.html', methods=['GET','POST'])
 def results():
-    #find names
+    #find songs from name
     name = request.form.getlist('name')
     print(name)
     names = []
     i = 0
     while(i<len(name)):
-        cursor = g.conn.execute("SELECT * FROM artist WHERE artist_name = '{}'".format(name[i]))
+        cursor = g.conn.execute("SELECT song_name FROM artist,song WHERE song.artist_id = artist.artist_id"
+                                " AND artist_name = '{}'".format(name[i]))
         for result in cursor:
-            names.append(result['artist_name'])  # can also be accessed using result[0]
+            names.append(result['song_name'])  # can also be accessed using result[0]
+            print("made it here for name")
         cursor.close()
         i+=1
-   # context = dict(data=names)
-
+# find songs from year
     year = request.form.getlist('year')
     print(year)
     years = []
     i = 0
     while (i < len(year)):
-        cursor = g.conn.execute("SELECT * FROM song WHERE year = '{}'".format(year[i]))
+        cursor = g.conn.execute("SELECT song_name FROM song WHERE year = '{}'".format(year[i]))
         for result in cursor:
-            years.append(result['year'])  # can also be accessed using result[0]
+            years.append(result['song_name'])  # can also be accessed using result[0]
+            print("made it here for year")
         cursor.close()
         i += 1
 
-    context = dict(data=years)
+
+    #find songs from album
+    album = request.form.getlist('album')
+    albums = []
+    i = 0
+    while (i < len(album)):
+        cursor = g.conn.execute("SELECT song_name FROM song,album WHERE song.album_id = album.album_id"
+                                " AND album_name = '{}'".format(album[i]))
+        for result in cursor:
+            albums.append(result['song_name'])  # can also be accessed using result[0]
+            print("made it here for album")
+        cursor.close()
+        i += 1
+
+    #find songs from genre
+    genre = request.form.getlist('genre')
+    genres = []
+    i = 0
+    while (i < len(genre)):
+        cursor = g.conn.execute("SELECT song_name FROM song,genre WHERE song.artist_id = genre.artist_id"
+                                " AND genre_name = '{}'".format(genre[i]))
+        for result in cursor:
+            genres.append(result['song_name'])  # can also be accessed using result[0]
+            print("made it here for genre")
+        cursor.close()
+        i += 1
+
+    #find songs in songs
+    song = request.form.getlist('song')
+    songs = song
+
+    #Create list of interesection for these lists
+    filledLists = []
+    #this is super sloppy and horrid, but whatever
+    if(len(names)!=0):
+        filledLists.append(names)
+    if (len(years) != 0):
+        filledLists.append(years)
+    if (len(albums) != 0):
+        filledLists.append(albums)
+    if (len(genres) != 0):
+        filledLists.append(genres)
+    if (len(songs) != 0):
+        filledLists.append(songs)
+
+    intersection = list(set(filledLists[0]).intersection(*filledLists))
+    print("please work")
+    print(intersection)
+
+    return render_template("another.html", names = names, years = years, albums = albums, genres = genres, songs = songs )
+
+@app.route('/')
+def my_view():
+    year = [1,2,3]
+    context = dict(data=year)
+    return render_template('index.html',**context)
 
 
-    return render_template("another.html", **context)
 
-#wtf
 if __name__ == "__main__":
   import click
 
