@@ -23,6 +23,10 @@ from flask import Flask, request, render_template, g, redirect, Response
 from wordcloud import WordCloud
 import io
 import base64
+import spotipy
+import spotipy.util as util
+from lyric_cloud import word_cloud
+
 
 
 
@@ -116,6 +120,13 @@ def index():
   # DEBUG: this is debugging code to see what request looks like
   print (request.args)
 
+  lyric_query = "SELECT lyrics FROM SONG ;"
+  cursor = engine.execute(text(lyric_query))
+  lyric_list = []
+  for row in cursor:
+    lyric_list.append((row['lyrics']))
+
+  result = word_cloud(lyric_list)
 
   #
   # example of a database query
@@ -190,6 +201,7 @@ def index():
   # render_template looks in the templates/ folder for files.
   # for example, the below file reads template/index.html
   #
+
   return render_template("index.html", years=years,names = names,genres = genres,albums = albums,songs = songs)
 
 #
@@ -200,9 +212,35 @@ def index():
 # Notice that the function name is another() rather than index()
 # The functions for each app.route need to have different names
 #
-#@app.route('/another')
-#def another():
-#  return render_template("another.html")
+# @app.route('/another')
+# def another():
+# return render_template("another.html")
+
+# @app.route('/login')
+# def login():
+#     return render_template("login.html")
+
+
+@app.route('/testpage', methods=['POST', 'GET'])
+def testpage():
+    print "got it!"
+    username = request.form['username']
+    client_id = "08ce831d3cc3450a80d4333d11bb9945"
+    client_secret = "08434edc62004761a790d8014a3a5e79"
+    redirect_uri = "http://localhost:8111/callback"
+    token = util.prompt_for_user_token(username, scope=None, client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri)
+    sp = spotipy.Spotify(token)
+    playlists = sp.user_playlists(username)
+
+    playlist_names = []
+    for playlist in playlists['items']:
+        # print(playlist['name'])
+        playlist_names.append(playlist['name'])
+
+    for x in playlist_names:
+        print x
+
+    return render_template("testpage.html", username=username, playlists=playlist_names)
 
 def removeDuplicates(values):
     mySet = set(values)
@@ -228,35 +266,15 @@ def songLyrics():
 @app.route('/cloud')
 def cloud():
 
+    ##NOT NECESSARY IN FINAL
     lyric_query = "SELECT lyrics FROM SONG WHERE song_name LIKE 'Famous' ;"
     cursor = engine.execute(text(lyric_query))
     lyric_list = []
     for row in cursor:
         lyric_list.append((row['lyrics']))
-    word_mass = ''.join(lyric_list)
 
-    cloud = WordCloud().generate(word_mass)
 
-    # Display the generated image:
-    # the matplotlib way:
-    import matplotlib.pyplot as plt
-    plt.imshow(cloud)
-    plt.axis("off")
-
-    # lower max_font_size
-    cloud = WordCloud(max_font_size=40).generate(word_mass)
-    plt.figure()
-    plt.imshow(cloud)
-    plt.axis("off")
-    # plt.show()
-    plt.savefig('templates/images/cloud.png')
-
-    figfile = io.BytesIO()
-    plt.savefig(figfile, format='png')
-    figfile.seek(0)
-    figdata_png = base64.b64encode(figfile.getvalue())
-    result = figdata_png
-
+    result = word_cloud(lyric_list)
     return render_template('cloud.html', result=result)
 
 
