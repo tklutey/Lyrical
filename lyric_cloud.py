@@ -42,6 +42,7 @@ def word_cloud(lyric_list):
     # Display the generated image:
     # the matplotlib way:
     import matplotlib.pyplot as plt
+    plt.use('Agg')
     # plt.imshow(cloud)
     plt.axis("off")
 
