@@ -23,7 +23,7 @@ def lyrics(input_artist,input_song):
         return lyrics
     except IndexError:      #means that there are no lyrics for given song on azlyrics
         sys.stderr.write("No Lyrics Found \n")
-        return None
+        return " "
 
 """
 Function to convert Spotify metadata syntax into html-compatible queries.

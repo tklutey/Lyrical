@@ -11,8 +11,13 @@
   <h1>Lyrical</h1>
   <div>{{data}}</div>
 
+    {% if result != None %}
+    <img src="data:image/png;base64,{{ result }}">
+    {% endif %}
+
+  <h2> Query to see different wordclouds! </h2>
   <!--Dropdown menus-->
-  <form name = selection action="another.html" method='POST'>
+  <form name = selection action="cloud.html" method='POST'>
       <select multiple name = "song">
           {% for n in songs %}
                 <option value="{{ n }}">{{ n }}</option>
@@ -41,20 +46,31 @@
       <button type="submit">Search</button>
   </form>
 
-  <form name="name" action="another.html" method='POST'>
-    <select multiple name="name">
-        <option value="Neil Young">Neil Young</option>
-        <option value="Radiohead">Radiohead</option>
-        <option value="Neon Indian">Neon Indian</option>
-    </select>
-      <select multiple name="year">
-        <option value="1990">1990</option>
-        <option value="1997">1997</option>
-        <option value="2015">2015</option>
-    </select>
+  <!--<form name="name" action="cloud.html" method='POST'>-->
+    <!--<select multiple name="name">-->
+        <!--<option value="Neil Young">Neil Young</option>-->
+        <!--<option value="Radiohead">Radiohead</option>-->
+        <!--<option value="Neon Indian">Neon Indian</option>-->
+    <!--</select>-->
+      <!--<select multiple name="year">-->
+        <!--<option value="1990">1990</option>-->
+        <!--<option value="1997">1997</option>-->
+        <!--<option value="2015">2015</option>-->
+    <!--</select>-->
 
-    <button type="submit">Search</button>
-</form>
+    <!--<button type="submit">Search</button>-->
+<!--</form>-->
+
+  <h2> Add new playlists here! </h2>
+  <p>
+   <form action="/", method="POST">
+      Spotify username:
+      <input type="text" name="username">
+      Playlist URI:
+      <input type="text" name="playlist_uri"><br>
+      <input type="submit" value="Submit">
+   </form>
+  </p>
 
 
 
@@ -65,9 +81,9 @@
     {% endfor %}
   </div>
 
-<p><a href="another">Go to the other page</a></p>
+<!--<p><a href="another">Go to the other page</a></p>-->
 
-  <p><a href="cloud">Check out a sample word cloud!</a></p>
+  <!--<p><a href="cloud">Check out a sample word cloud!</a></p>-->
 
 
 
