@@ -38,6 +38,11 @@
                 <option value="{{ n }}">{{ n }}</option>
           {% endfor %}
       </select>
+      <select multiple name = "playlist">
+          {% for n in playlists %}
+                <option value="{{ n }}">{{ n }}</option>
+          {% endfor %}
+      </select>
       <button type="submit">Search</button>
   </form>
 
@@ -75,17 +80,6 @@
       </select>
       <button type="submit">Gimme the lyrics</button>
   </form>
-
-  <p>If you want to change playlist, select a new one here:</p>
-    <form name = selection action="/" method='POST'>
-      <select name = "playlist">
-          {% for n in playlists %}
-                <option value="{{ n }}">{{ n }}</option>
-          {% endfor %}
-      </select>
-      <button type="submit">Change to selected playlist</button>
-  </form>
-
 
 <p><a href="another">Go to the other page</a></p>
 

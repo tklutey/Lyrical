@@ -120,10 +120,6 @@ def index():
   # DEBUG: this is debugging code to see what request looks like
   print (request.args)
 
-  if request.form:
-      new_playlist = request.form.getlist('playlist')[0]
-     #add data malarky
-
 
 
 
@@ -362,6 +358,22 @@ def results():
         cursor.close()
         i += 1
 
+    #find songs from playlist
+    playlist = request.form.getlist('playlist')
+    playlists = []
+    i = 0
+    while (i < len(playlist)):
+        cursor = g.conn.execute("SELECT song_name FROM song,playlist,contains WHERE "
+                                "playlist.playlist_id = contains.playlist_id AND "
+                                "song.song_id = contains.song_id AND "
+                                "playlist_name = '{}'".format(playlist[i]))
+        for result in cursor:
+            playlists.append(result['song_name'])  # can also be accessed using result[0]
+
+        cursor.close()
+        i += 1
+
+
     #find songs in songs
     song = request.form.getlist('song')
     songs = song
@@ -379,11 +391,14 @@ def results():
         filledLists.append(genres)
     if (len(songs) != 0):
         filledLists.append(songs)
+    if (len(playlists) != 0):
+        filledLists.append(playlists)
 
     intersection = list(set(filledLists[0]).intersection(*filledLists))
 
 
-    return render_template("another.html", names = names, years = years, albums = albums, genres = genres, songs = songs )
+    return render_template("another.html", names = names, years = years, albums = albums, genres = genres, songs = songs,
+                           playlists = playlists)
 
 @app.route('/')
 def my_view():
