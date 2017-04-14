@@ -25,6 +25,7 @@ import io
 import base64
 import spotipy
 import spotipy.util as util
+
 from lyric_cloud import word_cloud
 import adddata
 
@@ -121,6 +122,7 @@ def index():
   # DEBUG: this is debugging code to see what request looks like
   print (request.args)
 
+
   if request.form:
     username = request.form.getlist('username')[0]
     playlist_uri = request.form.getlist('playlist_uri')[0]
@@ -132,6 +134,7 @@ def index():
   lyric_list = []
   for row in cursor:
     lyric_list.append((row['lyrics']))
+
 
   main_cloud = word_cloud(lyric_list)
 
@@ -151,7 +154,7 @@ def index():
       years.append(result['year'])  # can also be accessed using result[0]
   cursor.close()
   years = sorted(removeDuplicates(years))
-  print(years)
+
 
   cursor = g.conn.execute("SELECT genre_name FROM genre")
   genres = []
@@ -173,6 +176,13 @@ def index():
       songs.append(result['song_name'])  # can also be accessed using result[0]
   cursor.close()
   songs = sorted(removeDuplicates(songs))
+
+  cursor = g.conn.execute("SELECT playlist_name FROM playlist")
+  playlists = []
+  for result in cursor:
+      playlists.append((result["playlist_name"]))
+  cursor.close()
+  playlists = sorted(playlists)
 
   #
   # Flask uses Jinja templates, which is an extension to HTML where you can
@@ -209,12 +219,13 @@ def index():
   # for example, the below file reads template/index.html
   #
 
-  return render_template("index.html", result=main_cloud, years=years,names = names,genres = genres,albums = albums,songs = songs)
+
+  return render_template("index.html", result=main_cloud, years=years,names = names,genres = genres,albums = albums,songs = songs, playlists=playlists)
 
 
 @app.route('/testpage', methods=['POST', 'GET'])
 def testpage():
-    print "got it!"
+    print ("got it!")
     username = request.form['username']
     client_id = "08ce831d3cc3450a80d4333d11bb9945"
     client_secret = "08434edc62004761a790d8014a3a5e79"
@@ -229,7 +240,7 @@ def testpage():
         playlist_names.append(playlist['name'])
 
     for x in playlist_names:
-        print x
+        print (x)
 
     return render_template("testpage.html", username=username, playlists=playlist_names)
 
@@ -238,6 +249,36 @@ def removeDuplicates(values):
     result = list(mySet)
     return result
 
+@app.route('/songLyrics.html', methods=['POST'])
+def songLyrics():
+    song = request.form['song']
+    cursor = engine.execute("SELECT lyrics FROM song WHERE song_name = '{}'".format(song))
+
+    lyric_list = 0
+    for result in cursor:
+        lyric_list = (result['lyrics'])
+    # print(lyric_list)
+    list = lyric_list.splitlines()
+
+    # print(lyric_list[2])
+    # print(lyric_list)
+    return render_template('songLyrics.html',lyrics = list)
+
+
+# @app.route('/cloud')
+# def cloud():
+
+    ##NOT NECESSARY IN FINAL
+    # lyric_query = "SELECT lyrics FROM SONG WHERE song_name LIKE 'Famous' ;"
+    # cursor = engine.execute(text(lyric_query))
+    # lyric_list = []
+    # for row in cursor:
+    #     lyric_list.append((row['lyrics']))
+    #
+    #
+    # result = word_cloud(lyric_list)
+    # return render_template('cloud.html', result=result)
+=======
 def cloud(song_list):
 
 
@@ -274,7 +315,7 @@ def add():
 def results():
     #find songs from name
     name = request.form.getlist('name')
-    print(name)
+
     names = []
     i = 0
     while(i<len(name)):
@@ -282,19 +323,19 @@ def results():
                                 " AND artist_name = '{}'".format(name[i]))
         for result in cursor:
             names.append(result['song_name'])  # can also be accessed using result[0]
-            print("made it here for name")
+
         cursor.close()
         i+=1
 # find songs from year
     year = request.form.getlist('year')
-    print(year)
+
     years = []
     i = 0
     while (i < len(year)):
         cursor = g.conn.execute("SELECT song_name FROM song WHERE year = '{}'".format(year[i]))
         for result in cursor:
             years.append(result['song_name'])  # can also be accessed using result[0]
-            print("made it here for year")
+
         cursor.close()
         i += 1
 
@@ -308,7 +349,7 @@ def results():
                                 " AND album_name = '{}'".format(album[i]))
         for result in cursor:
             albums.append(result['song_name'])  # can also be accessed using result[0]
-            print("made it here for album")
+
         cursor.close()
         i += 1
 
@@ -321,9 +362,25 @@ def results():
                                 " AND genre_name = '{}'".format(genre[i]))
         for result in cursor:
             genres.append(result['song_name'])  # can also be accessed using result[0]
-            print("made it here for genre")
+
         cursor.close()
         i += 1
+
+    #find songs from playlist
+    playlist = request.form.getlist('playlist')
+    playlists = []
+    i = 0
+    while (i < len(playlist)):
+        cursor = g.conn.execute("SELECT song_name FROM song,playlist,contains WHERE "
+                                "playlist.playlist_id = contains.playlist_id AND "
+                                "song.song_id = contains.song_id AND "
+                                "playlist_name = '{}'".format(playlist[i]))
+        for result in cursor:
+            playlists.append(result['song_name'])  # can also be accessed using result[0]
+
+        cursor.close()
+        i += 1
+
 
     #find songs in songs
     song = request.form.getlist('song')
@@ -342,8 +399,11 @@ def results():
         filledLists.append(genres)
     if (len(songs) != 0):
         filledLists.append(songs)
+    if (len(playlists) != 0):
+        filledLists.append(playlists)
 
     intersection = list(set(filledLists[0]).intersection(*filledLists))
+
     print("please work")
     print(intersection)
     # cloud(intersection)
