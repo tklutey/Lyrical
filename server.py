@@ -26,6 +26,7 @@ import base64
 import spotipy
 import spotipy.util as util
 from lyric_cloud import word_cloud
+import adddata
 
 
 
@@ -105,7 +106,7 @@ def teardown_request(exception):
 # see for routing: http://flask.pocoo.org/docs/0.10/quickstart/#routing
 # see for decorators: http://simeonfranklin.com/blog/2012/jul/1/python-decorators-in-12-steps/
 #
-@app.route('/')
+@app.route('/', methods=['POST', 'GET'])
 def index():
   """
   request is a special object that Flask provides to access web request information:
@@ -120,13 +121,19 @@ def index():
   # DEBUG: this is debugging code to see what request looks like
   print (request.args)
 
+  if request.form:
+    username = request.form.getlist('username')[0]
+    playlist_uri = request.form.getlist('playlist_uri')[0]
+    adddata.parse_playlist(username, playlist_uri, engine)
+
+
   lyric_query = "SELECT lyrics FROM SONG ;"
   cursor = engine.execute(text(lyric_query))
   lyric_list = []
   for row in cursor:
     lyric_list.append((row['lyrics']))
 
-  result = word_cloud(lyric_list)
+  main_cloud = word_cloud(lyric_list)
 
   #
   # example of a database query
@@ -202,23 +209,7 @@ def index():
   # for example, the below file reads template/index.html
   #
 
-  return render_template("index.html", years=years,names = names,genres = genres,albums = albums,songs = songs)
-
-#
-# This is an example of a different path.  You can see it at:
-#
-#     localhost:8111/another
-#
-# Notice that the function name is another() rather than index()
-# The functions for each app.route need to have different names
-#
-# @app.route('/another')
-# def another():
-# return render_template("another.html")
-
-# @app.route('/login')
-# def login():
-#     return render_template("login.html")
+  return render_template("index.html", result=main_cloud, years=years,names = names,genres = genres,albums = albums,songs = songs)
 
 
 @app.route('/testpage', methods=['POST', 'GET'])
@@ -247,19 +238,23 @@ def removeDuplicates(values):
     result = list(mySet)
     return result
 
-@app.route('/cloud')
-def cloud():
+def cloud(song_list):
 
-    ##NOT NECESSARY IN FINAL
-    lyric_query = "SELECT lyrics FROM SONG WHERE song_name LIKE 'Famous' ;"
-    cursor = engine.execute(text(lyric_query))
+
     lyric_list = []
-    for row in cursor:
-        lyric_list.append((row['lyrics']))
+    for x in song_list:
+        lyric_query = "SELECT lyrics FROM SONG WHERE(song_name='" + x + "');"
+        cursor = engine.execute(text(lyric_query))
+        for row in cursor:
+            lyric_list.append((row['lyrics']))
 
-
-    result = word_cloud(lyric_list)
-    return render_template('cloud.html', result=result)
+    print "length = "
+    print len(lyric_list[0])
+    if len(lyric_list[0])<2:
+        return None
+    else:
+        result = word_cloud(lyric_list)
+        return result
 
 
 # Example of adding new data to the database
@@ -275,7 +270,7 @@ def add():
 #     abort(401)
 #     this_is_never_executed()
 
-@app.route('/another.html', methods=['GET','POST'])
+@app.route('/cloud.html', methods=['GET','POST'])
 def results():
     #find songs from name
     name = request.form.getlist('name')
@@ -351,8 +346,19 @@ def results():
     intersection = list(set(filledLists[0]).intersection(*filledLists))
     print("please work")
     print(intersection)
+    # cloud(intersection)
+    if len(intersection)!=0:
+        wordcloud = cloud(intersection)
+        if wordcloud:
+            return render_template("cloud.html", result=wordcloud)
+        else:
+            return render_template("nothing.html")
+    else:
+        return render_template("nothing.html")
 
-    return render_template("another.html", names = names, years = years, albums = albums, genres = genres, songs = songs )
+    # return intersection
+
+    #return render_template("another.html", names = names, years = years, albums = albums, genres = genres, songs = songs )
 
 @app.route('/')
 def my_view():
