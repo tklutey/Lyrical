@@ -66,7 +66,7 @@
   </div>
 
 
-  <p>Just want the song lyrics?  Select a song here</p>
+  <p>Just want the song lyrics?  Select a song here:</p>
   <form name = selection action="songLyrics.html" method='POST'>
       <select multiple name = "song">
           {% for n in songs %}
@@ -76,9 +76,9 @@
       <button type="submit">Gimme the lyrics</button>
   </form>
 
-  <p>If you want to change playlist, select a new one here</p>
+  <p>If you want to change playlist, select a new one here:</p>
     <form name = selection action="/" method='POST'>
-      <select multiple name = "playlist">
+      <select name = "playlist">
           {% for n in playlists %}
                 <option value="{{ n }}">{{ n }}</option>
           {% endfor %}
