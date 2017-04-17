@@ -48,7 +48,6 @@ def word_cloud(lyric_list):
     # lower max_font_size
     cloud = WordCloud(max_font_size=40).generate(word_mass)
     plt.figure()
-    plt.imshow(cloud)
     plt.axis("off")
     # plt.show()
     plt.savefig('templates/images/cloud.png')

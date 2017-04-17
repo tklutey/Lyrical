@@ -91,10 +91,13 @@ def parse_playlist(username, playlist_uri, engine):
                     engine.execute(text(in_genre_insert))
 
 
-# def make_engine():
-#         DBURI = "postgresql://tlk2129:0790@104.196.135.151/proj1part2"
-#         engine = create_engine(DBURI)
-#         return engine
-#
-# parse_playlist("tklutey", "spotify:user:tklutey:playlist:5qpLsOzNuCNH43zTMPPEWD", make_engine())
+def make_engine():
+        DBURI = "postgresql://tlk2129:0790@104.196.135.151/proj1part2"
+        engine = create_engine(DBURI)
+        return engine
+
+parse_playlist("tklutey", "spotify:user:tklutey:playlist:4jsH6oQYN8jA29OWdKaxAM", make_engine())
+parse_playlist("12167726056", "spotify:user:12167726056:playlist:4mT0NnllTE9ymljSTxAQr3", make_engine())
+
+
 
