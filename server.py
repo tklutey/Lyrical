@@ -289,8 +289,8 @@ def cloud(song_list):
         for row in cursor:
             lyric_list.append((row['lyrics']))
 
-    print "length = "
-    print len(lyric_list[0])
+    print ("length = ")
+    print (len(lyric_list[0]))
     if len(lyric_list[0])<2:
         return None
     else:
@@ -358,8 +358,9 @@ def results():
     genres = []
     i = 0
     while (i < len(genre)):
-        cursor = g.conn.execute("SELECT song_name FROM song,genre WHERE song.artist_id = genre.artist_id"
-                                " AND genre_name = '{}'".format(genre[i]))
+        cursor = g.conn.execute("SELECT song_name FROM song,genre,in_genre WHERE song.artist_id = in_genre.artist_id"
+                                " AND genre.genre_name = in_genre.genre_name AND"
+                                " genre.genre_name = '{}'".format(genre[i]))
         for result in cursor:
             genres.append(result['song_name'])  # can also be accessed using result[0]
 
